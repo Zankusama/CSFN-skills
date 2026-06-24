@@ -3,21 +3,21 @@ name: zhi-shi-bian-yi
 description: >
   Karpathy 模式自生长知识库编译器——把原始资料编译成结构化 wiki 文章，自动维护索引、交叉链接和矛盾检测。
   四操作：摄入（Ingest）/查询（Query，含反哺归档）/审查（Lint）/研究（Research）。
-  触发词：摄入/消化/把这篇文章加进知识库/编译知识库/检查知识库健康/知识库有XX吗/搜一下相关研究。支持直接发 URL+摄入指令，无需先剪藏到 raw/。
+  触发词：摄入/消化/把这篇文章加进知识库/编译知识库/检查知识库健康/查知识库/知识库有XX吗/搜一下相关研究。支持直接发 URL+摄入指令，无需先剪藏到 raw/。
   NOT for 读书（走读书助手）/纯聊天/代码编辑/文件操作。
   禁止XML标签 < >
 compatibility: workbuddy
 allowed-tools: [Read, Write, Edit, Bash, WebSearch, WebFetch]
 dependencies: [系统日志]
 conflicts: [读书助手]
-version: 2.1.0
+version: 2.3.0
 license: Proprietary
 ---
 
-# 🌱 知识编译 v2.2 — Karpathy 模式自生长引擎
+# 🌱 知识编译 v2.3 — Karpathy 模式自生长引擎
 
-> **版本**：v2.2.0 | **升级日期**：2026-06-24（v2.1.1→v2.2.0：Lint 新增索引对齐检查项）
-> **核心升级**：索引对齐检查 + 统计概览补充索引状态；前序版本核心升级：查询反哺 + 矛盾检测 + Frontmatter + SCHEMA.md + 置信度衰减 + 压缩概念索引
+> **版本**：v2.3.0 | **升级日期**：2026-06-25（v2.2.0→v2.3.0：Query 新增 _concepts.md 快速通道 + Ingest URL 直投修正）
+> **核心升级**：_concepts.md 快速通道（Step 0）+ 补「查知识库」触发词 + Ingest URL 直投必须存 raw/
 > **灵感来源**：Andrej Karpathy LLM Wiki + bluewater8008 生产实践 + 叶小钗 WorkBuddy+Obsidian 知识库实践
 > **运行前提**：布洛陀 1.0 五层记忆系统完整运行
 
@@ -102,7 +102,7 @@ NEVER 修改 L1-L5 记忆层文件。NEVER 修改其他 Skill 的产出文件。
 
 🔌 **熔断器**：成功=内容长度>0 | 失败=报告不可用 | 重试=1次
 
-**URL 直投**：WebFetch → 保存 `ai-research/{YYYY-MM-DD}-{标题}.md`
+**URL 直投**：WebFetch → 保存 `raw/{标题}.md`（必须存原始资料，禁止存 `ai-research/`）
 **文件摄入**：读取 `raw/` 中指定文件
 
 #### Step 2：识别主题 + 交叉验证检查
@@ -219,6 +219,21 @@ last_updated: YYYY-MM-DD
 无需问用户——直接存。只有闲聊式简短回答才跳过。
 
 ### 执行流程
+
+#### Step 0：`_concepts.md` 快速通道（v2.3 新增）
+
+📦 **产出物**：命中概念列表 + 直接定位的文章路径
+
+🔌 **熔断器**：成功=文件可读且非空 | 失败=跳过本步，直接进入 Step 1 | 重试=0次 | 降级=只做关键词匹配，不读文件
+
+1. 读取 `wiki/_concepts.md`（~1KB，极快）
+2. 将用户问题分词，与 `_concepts.md` 中的关键词做匹配
+3. **命中判定**：
+   - 命中 ≥1 个概念 → 直接获取对应的文章文件名，跳到 Step 1 的 L2（读该主题的 `_index.md`）或 L3（直接读命中文章）
+   - 未命中 → 进入 Step 1 标准渐进式定位
+4. **语义扩展匹配**（命中时追加）：对用户问题提取近义词，再匹配一次，降低漏检率
+
+> **设计原理**：`_concepts.md` 是压缩索引，读它比读 `_master_index.md`（42 篇摘要）快 10 倍以上。大部分常见问题（产品策略/思维模型/设计原则）都能在此步直接命中。
 
 #### Step 1：渐进式定位（L1→L2→L3）
 
@@ -421,4 +436,22 @@ WebSearch → 保存 ai-research/ → 转入 Ingest 流程（v2.0 标准）
 
 ---
 
-版本：v2.2.0 | v2.2.0 新增索引对齐检查（Lint 全库对比 `_master_index.md` 与实际文件数）
+---
+
+## 可选：让 Agent 自动调取知识库
+
+默认情况下，知识库查询需要手动触发（说「查知识库」「知识库有XX吗」）。
+
+如果你希望 Agent 在每次回复前都检查知识库（「第二大脑」模式），
+在 WorkBuddy 的 Project Context（或 custom-rules.mdc）中加入：
+
+> **知识库思维增强（强制）**
+> 每次回复前，按强制清单检查（见路由对照表"知识检索"行）。命中 → 读 `_concepts.md` → 自然融入回复。
+> 完整检查清单+执行流程 → 详解存档版 §2.16-1
+> 口诀：`查清单，命中就查，不确定也查`
+
+**注意**：此模式会增加 token 消耗和回复延迟。如只想「按需查」，不改配置即可，用触发词手动调用。
+
+---
+
+版本：v2.3.0 | v2.3.0 新增 _concepts.md 快速通道（Query Step 0）+ 补「查知识库」触发词 + Ingest URL 直投必须存 raw/
