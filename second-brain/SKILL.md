@@ -10,14 +10,14 @@ compatibility: workbuddy
 allowed-tools: [Read, Write, Edit, Bash, WebSearch, WebFetch]
 dependencies: [系统日志]
 conflicts: [读书助手]
-version: 2.3.0
+version: 2.3.1
 license: Proprietary
 ---
 
 # 🌱 Second Brain v2.3 — 知识编译（Karpathy 模式自生长引擎）
 
-> **版本**：v2.3.0 | **升级日期**：2026-06-25（v2.2.0→v2.3.0：Query 新增 _concepts.md 快速通道 + Ingest URL 直投修正）
-> **核心升级**：_concepts.md 快速通道（Step 0）+ 补「查知识库」触发词 + Ingest URL 直投必须存 raw/
+> **版本**：v2.3.1 | **升级日期**：2026-06-25（v2.3.0→v2.3.1：合规修复 P0 项——补路径声明指令 + Query Step 0 熔断器降级逻辑修正）
+> **核心升级**：铁律声明新增路径声明（被触发后第一条回复必须声明`Second Brain {操作名}已启动`）；Query Step 0 熔断器降级方案修正为「跳过 Step 0 直接进入 Step 1」
 > **灵感来源**：Andrej Karpathy LLM Wiki + bluewater8008 生产实践 + 叶小钗 WorkBuddy+Obsidian 知识库实践
 > **运行前提**：布洛陀 1.0 五层记忆系统完整运行
 
@@ -35,6 +35,8 @@ NEVER 修改 L1-L5 记忆层文件。NEVER 修改其他 Skill 的产出文件。
 **CRITICAL — 严禁虚构不存在的 `[[wikilinks]]`。**
 
 **CRITICAL — 发现矛盾必须标注 `[⚠️ 矛盾]`，NEVER 悄悄覆盖。**
+
+**CRITICAL — 路径声明（v2.3 新增）。** 本 Skill 被触发后，第一条回复必须声明当前执行路径，格式：`Second Brain {操作名}已启动`。操作名=Ingest/Query/Lint/Research 之一。
 
 ---
 
@@ -224,7 +226,7 @@ last_updated: YYYY-MM-DD
 
 📦 **产出物**：命中概念列表 + 直接定位的文章路径
 
-🔌 **熔断器**：成功=文件可读且非空 | 失败=跳过本步，直接进入 Step 1 | 重试=0次 | 降级=只做关键词匹配，不读文件
+🔌 **熔断器**：成功=文件可读且非空 | 失败=跳过本步，直接进入 Step 1 | 重试=0次 | 降级=跳过本步，直接进入 Step 1 标准渐进式定位
 
 1. 读取 `wiki/_concepts.md`（~1KB，极快）
 2. 将用户问题分词，与 `_concepts.md` 中的关键词做匹配
@@ -454,4 +456,4 @@ WebSearch → 保存 ai-research/ → 转入 Ingest 流程（v2.0 标准）
 
 ---
 
-版本：v2.3.0 | v2.3.0 新增 _concepts.md 快速通道（Query Step 0）+ 补「查知识库」触发词 + Ingest URL 直投必须存 raw/
+版本：v2.3.1 | v2.3.1 合规修复 P0 项——铁律声明新增路径声明 + Query Step 0 熔断器降级逻辑修正
