@@ -1,26 +1,28 @@
 ---
 name: loop-engineering
 description: >
-  Loop Engineering (循环工程)。当用户说"循环+空格""loop+空格"开头或含"循环工程""loop工程""自主跑"时触发。
+  Loop Engineering (循环工程)。当用户以"循环+空格"或"loop+空格"开头，或说"循环工程"/"loop工程"/"自主跑"时触发。
   触发后必须先问一轮标准，再后台闭环跑到达标。NOT for普通问答/简单查询/纯闲聊。
   关键词：循环、loop、loop工程、循环工程、自主跑、闭环
 compatibility: workbuddy, qclaw, trae, trae-solo, wukong, qoderwork
 allowed-tools: [Read, Write, Edit, Bash, Grep, Glob, Agent, TaskCreate, TaskUpdate, TaskList, TaskOutput, WebFetch, WebSearch]
 dependencies: []
-version: "1.2.0"
+version: "1.2.1"
 license: Proprietary
 ---
 
 # Loop Engineering
 
-> **版本**：v1.1.0 | **创建日期**：2026-06-21
-> **灵感来源**：Addy Osmani（谷歌云AI总监）Loop Engineering 原文 + Peter Steinberger（OpenClaw创始人）原推 + Boris Cherny（Claude Code负责人）实践
+> **版本**：v1.2.1 | **更新日期**：2026-06-25
+> **灵感来源**：Addy Osmani（谷歌云AI总监）Loop Engineering 原文 + Peter Steinberger（OpenClaw创始人）原推 + Boris Cherny（Claude Code负责人）实践 + 叶小钗 WorkBuddy实践笔记
 
 ---
 
 ## ⚠️ 铁律声明
 
 **CRITICAL — 触发后第一个动作必须是：执行阶段0+阶段1（前置判定+标准收集）。NEVER跳过阶段1直接进入执行。原因：没有标准的Loop跑完也是白跑。**
+
+**CRITICAL — Stage 1 标准收集完成后，必须向用户展示完整标准清单并等待明确确认（"开始跑"或类似指令），才能进入Stage 2。NEVER在用户未确认的情况下开始执行。原因：用户需要在开始前知道Loop按什么标准跑、跑几轮。**
 
 **CRITICAL — 触发条件严格：只有用户以"循环""loop"开头的话才进入Loop模式。没有这个前缀一律按正常对话处理。原因：防止普通问题误触发导致体验变差。**
 
@@ -102,12 +104,19 @@ license: Proprietary
 
 ---
 
-### 阶段1：标准收集（首次或模糊时触发）
+### 阶段1：标准收集（每次触发必走，不可跳过）
 
 📦 产出物：任务标准清单（写入 Skill 目录下 references/task-standards.json，文件不存在则初始化空JSON）
 
+**触发规则（强制执行）：**
+- ✅ 首次触发某类任务 → 必须走完整4问收集
+- ✅ 用户消息中包含部分标准描述（如"注意广告法"）→ 必须走完整4问，将用户已提到的标准预填到对应选项
+- ✅ 用户明确说"用上次的标准"或"复用上次" → 可读 task-standards.json 匹配，展示后确认
+- ❌ NEVER 因为用户消息中包含了某些标准词汇就判定"标准已完整"并跳过收集
+- ❌ NEVER 在用户未对标准清单做明确确认（说"开始跑"/"没问题"/"确认"等）之前进入 Stage 2
+
 **同类任务判定规则：**
-- 任务类型匹配 + 检查清单条目完全一致 = 同类任务，直接复用
+- 任务类型匹配 + 检查清单条目完全一致 = 同类任务，展示给用户确认后复用
 - 任务类型匹配但检查清单不同 = 用户确认是否复用上次标准（选"是"→复用；选"否"→覆盖JSON）
 
 进入Loop模式后，先读 references/task-standards.json：
@@ -162,6 +171,12 @@ license: Proprietary
 
 ④ 最大迭代轮次（到达后超限终止，交当前版）：
    □ 1轮  □ 2轮  □ 3轮（默认）  □ 5轮  □ 自己填：[__]轮
+
+⑤ 成功标准（可选，填了之后子Agent审查会更准）：
+   完成后，什么样的输出你会觉得"这次做得好"？
+   □ 没发现问题就是通过（只看负面约束）
+   □ 能达到以下正面标准：[你写，如"读完后能一句话说出产品核心卖点"]
+   ⚠️ 如果能同时描述正面成功标准，子Agent审查会更准确。不填也行，跳过此题。
 ```
 
 用户选完后，写进 `references/task-standards.json`。**存储规则：同一任务类型只保留最新一条标准，覆盖旧配置。** 之后同类任务直接读文件不复问。
@@ -188,6 +203,12 @@ license: Proprietary
 ### 阶段2：循环执行（闭环核心）
 
 📦 产出物：progress.md（存放在当前工作目录下，文件名固定为 progress.md，单线程不冲突）+ 本轮产出
+
+> **📋 progress.md 是什么？**
+> 每次 Loop 运行时自动创建，记录每一轮做了什么、子Agent发现了哪些问题、本轮修正了哪些。
+> 存储路径：`[当前工作目录]/progress.md`
+> 你可以在 Loop 运行过程中随时让我读给你听，Loop 结束后保留供你回顾。
+> 达标交付后不会自动删除，你可以手动删或保留。
 
 循环结构如下——每一轮自动执行，你全程不在场。每轮迭代的边界是：**子Agent给出审查结果**。
 
@@ -222,6 +243,7 @@ license: Proprietary
   │       请按以下标准审查[任务类型]的产出：
   │       - 严格度：[用户选的严格度]
   │       - 检查清单：[用户选的检查项]
+       - 成功标准：[用户第⑤问的输入，如果没填就写"同检查清单"]
   │       - 找茬视角：假设这个产出要发布，你会找出什么问题？
   │       审查结果格式：通过/不通过 + 具体问题清单（每条问题标注严重程度）"
   │    ├─ 审查通过 → 本轮达标，准备终止交付
@@ -434,7 +456,7 @@ license: Proprietary
 
 ## 行动倾向
 
-`default_to_action` — 进入Loop模式后直接执行，不先征求同意。原因：你说了"循环"就是主动触发了这个模式，不需要再问"可以开始吗"。
+`default_to_action` — 进入Loop模式后，Stage 1标准收集完成并经你确认，直接开始执行，不额外征求"可以开始吗"。Stage 1标准收集本身不可跳过，必须完成。
 
 ---
 
