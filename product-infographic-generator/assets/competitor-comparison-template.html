@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{产品名} - 竞品对比</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== 基础重置 ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ===== VI配色（暖调和谐版，竞品色区分度足够）===== */
+  :root {
+    --brand: #E85A24;
+    --brand-dark: #C24518;
+    --brand-light: #F07846;
+    --brand-soft: #F5A080;
+    --brand-pale: #FEF0EC;
+    --ink: #2a2018;
+    --text-secondary: #6b5e54;
+    --text-light: #a89888;
+    --paper: #faf8f2;
+    --paper-warm: #f5f0e6;
+    --border: #e0d5c0;
+    --divider: #e8e0d0;
+    /* 竞品配色 — 暖调有区分度 */
+    --c1: #4a6b7a;
+    --c2: #5a8a5a;
+    --c3: #a07030;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .top-border {
+    height: 6px;
+    background: linear-gradient(90deg, var(--brand) 0%, var(--warm-gold) 50%, var(--brand) 100%);
+  }
+
+  /* ===== 头部 ===== */
+  .header {
+    background: linear-gradient(135deg, #E85A24 0%, #F07846 100%);
+    color: #ffffff;
+    padding: 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .header-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-left { flex: 1; }
+  .header-logo {
+    width: auto;
+    max-width: 140px;
+    height: auto;
+    max-height: 42px;
+    filter: brightness(0) invert(1);
+  }
+  .brand-label {
+    font-size: 12px;
+    letter-spacing: 4px;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+  }
+  .page-subtitle {
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    opacity: 0.95;
+  }
+
+  /* ===== Section标题 ===== */
+  .section {
+    padding: 40px 60px;
+  }
+  .section-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 24px;
+    background: var(--brand);
+    border-radius: 2px;
+  }
+
+  /* ===== 竞品定位卡片 ===== */
+  .positioning-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .positioning-card {
+    border-radius: 8px;
+    padding: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .positioning-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .positioning-card.brand {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
+    box-shadow: 0 4px 16px rgba(232,90,36,0.3);
+  }
+  .positioning-card.c1 { background: linear-gradient(135deg, #7a8a7a 0%, #9a9a8a 100%); }
+  .positioning-card.c2 { background: linear-gradient(135deg, #6a7a6a 0%, #8a9a8a 100%); }
+  .positioning-card.c3 { background: linear-gradient(135deg, #8a7a6a 0%, #a08060 100%); }
+  .positioning-card h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .positioning-card p {
+    font-size: 13px;
+    line-height: 1.8;
+    opacity: 0.95;
+  }
+
+  /* ===== 核心参数速查（卡片式，通用化，不叫"技术路径"）===== */
+  .param-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .param-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+  }
+  .param-card.brand {
+    border-top: 3px solid var(--brand);
+    box-shadow: 0 2px 12px rgba(232,90,36,0.1);
+  }
+  .param-card h4 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .param-card.brand h4 { color: var(--brand); }
+  .param-card.c1 h4 { color: var(--c1); }
+  .param-card.c2 h4 { color: var(--c2); }
+  .param-card.c3 h4 { color: var(--c3); }
+  .param-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 7px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed var(--divider);
+  }
+  .param-row:last-child { border-bottom: none; }
+  .param-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+  .param-val {
+    color: var(--ink);
+    text-align: right;
+    flex: 1;
+    line-height: 1.5;
+  }
+  .param-card.brand .param-val { color: var(--brand-dark); font-weight: 600; }
+
+  /* ===== 雷达图三列排布 ===== */
+  .radar-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1fr;
+    gap: 36px;
+    align-items: center;
+  }
+  .radar-left, .radar-right {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .radar-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+  }
+  .radar-center canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+  .radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+    justify-content: center;
+  }
+  .radar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .radar-legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+
+  /* ===== 维度说明卡片（左右两侧）===== */
+  .dim-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    border-left: 3px solid var(--brand);
+  }
+  .dim-card h4 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-bottom: 10px;
+  }
+  .dim-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+  /* 品牌名颜色 — 与雷达图/参数卡配色一致 */
+  .dim-card .b-brand { color: var(--brand); font-weight: 600; }
+  .dim-card .b-c1 { color: var(--c1); font-weight: 600; }
+  .dim-card .b-c2 { color: var(--c2); font-weight: 600; }
+  .dim-card .b-c3 { color: var(--c3); font-weight: 600; }
+
+  /* ===== 核心结论 ===== */
+  .conclusion-card {
+    background: var(--brand-pale);
+    border-top: 4px solid var(--brand);
+    border-radius: 8px;
+    padding: 30px;
+  }
+  .conclusion-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .conclusion-content {
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: var(--ink);
+  }
+  .conclusion-content strong {
+    font-weight: 600;
+    color: var(--brand-dark);
+  }
+
+  /* ===== 底部 ===== */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.7);
+    padding: 24px 60px;
+    font-size: 12px;
+    line-height: 1.8;
+    text-align: center;
+  }
+  .footer-logo-wrap { margin-bottom: 12px; }
+  .footer-logo {
+    height: 36px;
+    width: auto;
+    filter: brightness(0) invert(1);
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 1200px) {
+    .positioning-grid, .param-grid { grid-template-columns: repeat(2, 1fr); }
+    .radar-layout { grid-template-columns: 1fr; }
+    .radar-left, .radar-right { flex-direction: row; flex-wrap: wrap; }
+    .radar-left .dim-card, .radar-right .dim-card { flex: 1; min-width: 220px; }
+  }
+  @media (max-width: 768px) {
+    .header, .section { padding: 30px 24px; }
+    .header-content { flex-direction: column-reverse; text-align: center; gap: 16px; }
+    .header-logo { max-width: 140px; max-height: 56px; }
+    .page-title { font-size: 32px; }
+    .positioning-grid, .param-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-border"></div>
+
+<!-- 头部 -->
+<div class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <div class="brand-label">蔡氏福宁 · 竞品对比分析</div>
+      <div class="page-title">{产品名称}</div>
+      <div class="page-subtitle">蔡氏福宁 vs 主要竞品对比分析</div>
+    </div>
+    <img src="logo.png" alt="蔡氏福宁" class="header-logo" />
+  </div>
+</div>
+
+<!-- 竞品定位（4卡片，品牌色区分） -->
+<div class="section" style="background: var(--paper);">
+  <div class="section-title">竞品定位</div>
+  <div class="positioning-grid">
+    <div class="positioning-card brand">
+      <h3>{品牌名}</h3>
+      <p>{品牌定位描述}</p>
+    </div>
+    <div class="positioning-card c1">
+      <h3>{竞品1名称}</h3>
+      <p>{竞品1定位描述}</p>
+    </div>
+    <div class="positioning-card c2">
+      <h3>{竞品2名称}</h3>
+      <p>{竞品2定位描述}</p>
+    </div>
+    <div class="positioning-card c3">
+      <h3>{竞品3名称}</h3>
+      <p>{竞品3定位描述}</p>
+    </div>
+  </div>
+</div>
+
+<!-- 核心参数速查（卡片式，通用化，不叫"技术路径"） -->
+<div class="section" style="background: white;">
+  <div class="section-title">核心参数速查</div>
+  <div class="param-grid">
+    <!-- 每个品牌一张卡片，内部 param-row 行数按实际参数动态生成 -->
+    <div class="param-card brand">
+      <h4>● {品牌名}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c1">
+      <h4>○ {竞品1名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c2">
+      <h4>○ {竞品2名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c3">
+      <h4>○ {竞品3名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 多维度综合对比（雷达图三列排布） -->
+<div class="section" style="background: var(--paper);">
+  <div class="section-title">多维度综合对比</div>
+  <div class="radar-layout">
+    <!-- 左侧卡片（对应雷达图左半轴维度） -->
+    <div class="radar-left">
+      <div class="dim-card">
+        <h4>① {维度名}</h4>
+        <p><span class="b-brand">{品牌名}</span>...<span class="b-c1">{竞品1}</span>...</p>
+      </div>
+      <div class="dim-card">
+        <h4>② {维度名}</h4>
+        <p>...</p>
+      </div>
+      <div class="dim-card">
+        <h4>③ {维度名}</h4>
+        <p>...</p>
+      </div>
+    </div>
+    <!-- 中间雷达图 -->
+    <div class="radar-center">
+      <canvas id="radarChart" width="400" height="400"></canvas>
+      <div class="radar-legend">
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--brand);"></span>蔡氏福宁</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c1);"></span>{竞品1}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c2);"></span>{竞品2}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c3);"></span>{竞品3}</div>
+      </div>
+    </div>
+    <!-- 右侧卡片（对应雷达图右半轴维度） -->
+    <div class="radar-right">
+      <div class="dim-card">
+        <h4>④ {维度名}</h4>
+        <p>...</p>
+      </div>
+      <div class="dim-card">
+        <h4>⑤ {维度名}</h4>
+        <p>...</p>
+      </div>
+      <div class="dim-card">
+        <h4>⑥ {维度名}</h4>
+        <p>...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 核心结论 -->
+<div class="section" style="background: white;">
+  <div class="section-title">核心结论</div>
+  <div class="conclusion-card">
+    <div class="conclusion-title">📊 购买建议</div>
+    <div class="conclusion-content">
+      {核心结论内容}
+    </div>
+  </div>
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  <div class="footer-logo-wrap">
+    <img src="logo.png" alt="蔡氏福宁" class="footer-logo" />
+  </div>
+  <div style="margin-top: 8px;">蔡氏福宁 · 新中式养生个护品牌 · Since 1828</div>
+</div>
+
+<script>
+  /*
+   * 雷达图规范：
+   * 1. 维度数量不固定，按产品brief中实际定义的维度动态生成
+   * 2. 打分用示意值（1-4），不要太满，最高不超过3.5
+   * 3. 蔡氏福宁用填充色突出（fill opacity 0.13，竞品0.05）
+   * 4. 不显示刻度数字（ticks.display: false）
+   * 5. 生成前必须与用户确认维度和各品牌打分排名
+   */
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['{维度1}', '{维度2}', '{维度3}', '{维度4}', '{维度5}', '{维度6}'],
+      datasets: [
+        {
+          label: '蔡氏福宁',
+          data: [3, 3, 3.5, 3, 3, 3.5],
+          borderColor: '#E85A24',
+          backgroundColor: 'rgba(232,90,36,0.13)',
+          borderWidth: 2.2,
+          pointBackgroundColor: '#E85A24',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointRadius: 4.5,
+        },
+        {
+          label: '{竞品1}',
+          data: [3.5, 3, 2, 3.5, 3.5, 1.5],
+          borderColor: '#4a6b7a',
+          backgroundColor: 'rgba(74,107,122,0.05)',
+          borderWidth: 2,
+          pointBackgroundColor: '#4a6b7a',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointRadius: 3.5,
+        },
+        {
+          label: '{竞品2}',
+          data: [3, 3, 2.5, 3.5, 3.5, 2],
+          borderColor: '#5a8a5a',
+          backgroundColor: 'rgba(90,138,90,0.05)',
+          borderWidth: 2,
+          pointBackgroundColor: '#5a8a5a',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointRadius: 3.5,
+        },
+        {
+          label: '{竞品3}',
+          data: [1.5, 1.5, 2, 2, 2, 2.5],
+          borderColor: '#a07030',
+          backgroundColor: 'rgba(160,112,48,0.05)',
+          borderWidth: 2,
+          pointBackgroundColor: '#a07030',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointRadius: 3.5,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        r: {
+          min: 0,
+          max: 4,
+          ticks: { display: false },
+          grid: { color: 'rgba(210,200,180,0.65)' },
+          angleLines: { color: 'rgba(210,200,180,0.5)' },
+          pointLabels: {
+            font: { size: 13, weight: '600', family: "'Noto Serif SC', serif" },
+            color: '#2a2018',
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          titleFont: { family: "'Noto Sans SC', sans-serif" },
+          bodyFont: { family: "'Noto Sans SC', sans-serif" },
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
