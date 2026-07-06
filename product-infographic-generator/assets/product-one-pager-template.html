@@ -284,26 +284,29 @@
     margin-right: 8px;
   }
   
-  .scent-section {
+  .sku-section {
     padding: 40px 60px;
     background: white;
   }
-  
-  .scent-grid {
+
+  .sku-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
-  
-  .scent-card {
+
+  /* ⚠️ 如果SKU只有2个，改为 repeat(2, 1fr) 并删除第3个sku-card */
+  /* ⚠️ 如果SKU有4-5个，改为 repeat(auto-fit, minmax(220px, 1fr)) */
+
+  .sku-card {
     border-radius: 8px;
     padding: 24px;
     color: white;
     position: relative;
     overflow: hidden;
   }
-  
-  .scent-card::before {
+
+  .sku-card::before {
     content: '';
     position: absolute;
     top: -30px;
@@ -313,19 +316,22 @@
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
   }
-  
-  .scent-card.green { background: linear-gradient(135deg, #5c8a42 0%, #7ab65a 100%); }
-  .scent-card.orange { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%); }
-  .scent-card.yellow { background: linear-gradient(135deg, #b8860b 0%, #d4a843 100%); }
-  
-  .scent-name {
+
+  /* ⚠️ 5种通用渐变 —— 根据SKU数量选用前N个 */
+  .sku-card.g1 { background: linear-gradient(135deg, #5c8a42 0%, #7ab65a 100%); }
+  .sku-card.g2 { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%); }
+  .sku-card.g3 { background: linear-gradient(135deg, #b8860b 0%, #d4a843 100%); }
+  .sku-card.g4 { background: linear-gradient(135deg, #4a6b7a 0%, #6b8e6b 100%); }
+  .sku-card.g5 { background: linear-gradient(135deg, #8b6f47 0%, #a07030 100%); }
+
+  .sku-name {
     font-family: 'Noto Serif SC', serif;
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 8px;
   }
-  
-  .scent-desc {
+
+  .sku-desc {
     font-size: 13px;
     line-height: 1.6;
     opacity: 0.95;
@@ -462,20 +468,20 @@
   }
   
   @media (max-width: 1200px) {
-    .pod-grid, .info-grid, .scent-grid, .scene-grid {
+    .pod-grid, .info-grid, .sku-grid, .scene-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
   
   @media (max-width: 768px) {
     body { padding: 0; }
-    .header, .pod-section, .info-section, .scent-section, .scene-section, .copy-section, .faq-section, .footer {
+    .header, .pod-section, .info-section, .sku-section, .scene-section, .copy-section, .faq-section, .footer {
       padding: 30px 24px;
     }
     .header-content { flex-direction: column-reverse; text-align: center; gap: 16px; }
     .header-logo { max-width: 140px; max-height: 56px; }
     .product-name { font-size: 32px; }
-    .pod-grid, .info-grid, .scent-grid, .scene-grid, .faq-list {
+    .pod-grid, .info-grid, .sku-grid, .scene-grid, .faq-list {
       grid-template-columns: 1fr;
     }
     .warning-list { columns: 1; }
@@ -621,24 +627,29 @@
   </div>
 </div>
 
-<!-- 三种香型（如有 —— 动态板块）
-     ⚠️ 如果产品无香型，删除整个scent-section
-     ⚠️ 如果产品只有2种香型，删除第3个scent-card并修改grid为repeat(2, 1fr)
-     ⚠️ 必须与markdown中的香型数量一致 -->
-<div class="scent-section">
-  <div class="section-title">三种香型</div>
-  <div class="scent-grid">
-    <div class="scent-card green">
-      <div class="scent-name">{香型1名称}</div>
-      <div class="scent-desc">{香型1描述}</div>
+<!-- 产品系列（如有 —— 动态板块）
+     ⚠️ 用途：展示多SKU产品的区分维度（功效/规格/温度/香型等）
+     ⚠️ 判断标准：brief中是否有多SKU且需要可视化区分
+     ⚠️ 无多SKU的产品（如休足贴只有1种规格）：删除整个sku-section
+     ⚠️ SKU数量=2：grid改repeat(2,1fr)，删第3个sku-card，用.g1+.g2
+     ⚠️ SKU数量=3：默认，用.g1+.g2+.g3
+     ⚠️ SKU数量=4~5：grid改repeat(auto-fit,minmax(220px,1fr))，追加sku-card，用.g1~.g5
+     ⚠️ 板块标题动态替换：{SKU区分维度} → 如"产品系列"/"两款功效"/"三种规格"
+-->
+<div class="sku-section">
+  <div class="section-title">{SKU区分维度}</div>
+  <div class="sku-grid">
+    <div class="sku-card g1">
+      <div class="sku-name">{SKU1名称}</div>
+      <div class="sku-desc">{SKU1描述}</div>
     </div>
-    <div class="scent-card orange">
-      <div class="scent-name">{香型2名称}</div>
-      <div class="scent-desc">{香型2描述}</div>
+    <div class="sku-card g2">
+      <div class="sku-name">{SKU2名称}</div>
+      <div class="sku-desc">{SKU2描述}</div>
     </div>
-    <div class="scent-card yellow">
-      <div class="scent-name">{香型3名称}</div>
-      <div class="scent-desc">{香型3描述}</div>
+    <div class="sku-card g3">
+      <div class="sku-name">{SKU3名称}</div>
+      <div class="sku-desc">{SKU3描述}</div>
     </div>
   </div>
 </div>
