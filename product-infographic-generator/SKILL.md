@@ -1,7 +1,7 @@
 ---
 name: product-infographic-generator
 description: "从产品brief生成HTML信息图。支持产品一页纸和竞品对比两种类型。当用户说「生成信息图」「产品一页纸」「竞品对比」时触发。"
-version: v2.4
+version: v2.5
 compatibility: "WorkBuddy Skill系统 v1.0+"
 allowed-tools: [Read, Write, Edit, Bash, present_files, Skill]
 license: "MIT"
@@ -208,11 +208,15 @@ cp ~/.workbuddy/skills/product-infographic-generator/assets/logo.png infographic
    - 统计FAQ数量（4/5/6/7个）
    - 统计注意事项数量（6-9条）
    - ⚠️ 如果数量与模板默认值不同，**必须调整HTML结构**
-4. 使用`Edit`工具替换HTML模板中的占位符：
-   - `{产品名称}` → 产品名称
-   - `{产品口号}` → 口号
-   - `{POD1标题}` → POD1标题
-   - ...（完整占位符列表见模板文件）
+4. **✅推荐：用生成脚本填充（避免占位符漏填）**
+   ```bash
+   python3 ~/.workbuddy/skills/product-infographic-generator/references/generate_infographic.py <类型子目录>
+   # 例：python3 .../generate_infographic.py infographic/蒸汽眼罩-产品一页纸
+   # 脚本自动解析 *_信息图内容.md / *_竞品对比内容.md 并填充模板，无残留占位符
+   ```
+   - ⚠️ 如果手动`Edit`填充：必须逐项核对占位符，生成后执行"残留占位符检查"
+   - 残留占位符检查：`grep -oE "\{[一-龥A-Za-z][一-龥A-Za-z0-9_]*\}" 输出.html` 应返回 0 处
+   - 完整占位符列表见模板文件（产品一页纸：POD1-4的标题/特征/优势/利益/vs竞品 + 列表类 + SKU1-3 + 场景1-3 + Q1-6/A1-6；竞品对比：参数卡片区/维度对比区-左·右/雷达标签/雷达数据-品牌·竞品1-3）
 
 #### ☑SHOULD: 动态板块匹配（⚠️核心步骤，不可跳过）
 
@@ -582,6 +586,7 @@ cp ~/.workbuddy/skills/product-infographic-generator/assets/logo.png infographic
 - `assets/product-one-pager-template.html` - 产品一页纸HTML模板（基于v3版本，设计已确认）
 - `assets/competitor-comparison-template.html` - 竞品对比HTML模板（基于v3版本设计风格）
 - `assets/logo.png` - 蔡氏福宁品牌logo文件（无底色PNG，v2.2内置到skill中）
+- `references/generate_infographic.py` - 信息图生成脚本（解析markdown中间文件→填充模板→输出HTML，自动处理动态板块与防残留占位符）
 
 ---
 
@@ -735,6 +740,7 @@ cp ~/.workbuddy/skills/product-infographic-generator/assets/logo.png infographic
 
 ## 版本历史
 
+- **v2.5** (2026-07-06): 修复模板结构性bug——①产品一页纸4个POD卡共用`{特征}/{优势}/{利益}/{vs竞品}`占位符改为每卡独立`{POD1特征}`~`{POD4vs竞品}`；②竞品对比param-card/维度卡片改为内容注入占位符（`{参数卡片区}`/`{维度对比区-左·右}`/`{雷达标签}`/`{雷达数据-品牌·竞品1-3}`），支持任意维度数；③新增`references/generate_infographic.py`生成脚本（解析markdown→填充→零残留占位符）；④补充POD"利益"字段；⑤footer免责声明统一为"内部绝密资料仅供参考 不可直接作为广告用语"
 - **v2.4** (2026-07-06): 产品系列板块通用化——"三种香型"改为动态"产品系列"板块（sku-section），支持任意SKU区分维度（功效/规格/温度/香型等），CSS类名scent-*全部改为sku-*，示例不再以"香型"为主导
 - **v2.3** (2026-07-06): 修复模板结构固化问题（新增动态板块匹配规则+熔断器第10条）、模板中标记动态板块注释
 - **v2.2** (2026-07-06): 新增信息准确性保障（6种可能性分析）、修复logo硬编码路径问题（改为内置到assets/）、新增熔断器第8/9条（信息遗漏/理解错误检测）
