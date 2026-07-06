@@ -621,7 +621,10 @@
   </div>
 </div>
 
-<!-- 三种香型（如有） -->
+<!-- 三种香型（如有 —— 动态板块）
+     ⚠️ 如果产品无香型，删除整个scent-section
+     ⚠️ 如果产品只有2种香型，删除第3个scent-card并修改grid为repeat(2, 1fr)
+     ⚠️ 必须与markdown中的香型数量一致 -->
 <div class="scent-section">
   <div class="section-title">三种香型</div>
   <div class="scent-grid">
@@ -640,7 +643,10 @@
   </div>
 </div>
 
-<!-- 使用场景 -->
+<!-- 使用场景 —— 动态板块
+     ⚠️ 场景数量必须与markdown一致（可能是3/4/5个）
+     ⚠️ 如果场景数≠3，修改grid-template-columns和增删scene-card
+     ⚠️ CSS .scene-grid 的 grid-template-columns 需同步调整 -->
 <div class="scene-section">
   <div class="section-title">使用场景</div>
   <div class="scene-grid">
@@ -670,7 +676,9 @@
   </div>
 </div>
 
-<!-- FAQ -->
+<!-- FAQ —— 动态板块
+     ⚠️ FAQ数量必须与markdown一致（可能是4/5/6/7个）
+     ⚠️ 如果FAQ数≠6，增删faq-item -->
 <div class="faq-section">
   <div class="section-title">常见问题 FAQ</div>
   <div class="faq-list">
