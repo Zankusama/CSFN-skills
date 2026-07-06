@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{产品名} - 竞品对比</title>
+<title>{产品名称} - 竞品对比</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -391,25 +391,8 @@
 <div class="section" style="background: white;">
   <div class="section-title">核心参数速查</div>
   <div class="param-grid">
-    <!-- 每个品牌一张卡片，内部 param-row 行数按实际参数动态生成 -->
-    <div class="param-card brand">
-      <h4>● {品牌名}</h4>
-      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
-      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
-    </div>
-    <div class="param-card c1">
-      <h4>○ {竞品1名称}</h4>
-      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
-      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
-    </div>
-    <div class="param-card c2">
-      <h4>○ {竞品2名称}</h4>
-      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
-    </div>
-    <div class="param-card c3">
-      <h4>○ {竞品3名称}</h4>
-      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
-    </div>
+    <!-- 参数卡片由生成脚本动态注入（4品牌 × N维度） -->
+    {参数卡片区}
   </div>
 </div>
 
@@ -417,45 +400,23 @@
 <div class="section" style="background: var(--paper);">
   <div class="section-title">多维度综合对比</div>
   <div class="radar-layout">
-    <!-- 左侧卡片（对应雷达图左半轴维度） -->
+    <!-- 左侧卡片（对应雷达图左半轴维度，由生成脚本注入） -->
     <div class="radar-left">
-      <div class="dim-card">
-        <h4>① {维度名}</h4>
-        <p><span class="b-brand">{品牌名}</span>...<span class="b-c1">{竞品1}</span>...</p>
-      </div>
-      <div class="dim-card">
-        <h4>② {维度名}</h4>
-        <p>...</p>
-      </div>
-      <div class="dim-card">
-        <h4>③ {维度名}</h4>
-        <p>...</p>
-      </div>
+      {维度对比区-左}
     </div>
     <!-- 中间雷达图 -->
     <div class="radar-center">
       <canvas id="radarChart" width="400" height="400"></canvas>
       <div class="radar-legend">
         <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--brand);"></span>蔡氏福宁</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c1);"></span>{竞品1}</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c2);"></span>{竞品2}</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c3);"></span>{竞品3}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c1);"></span>{竞品1名称}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c2);"></span>{竞品2名称}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c3);"></span>{竞品3名称}</div>
       </div>
     </div>
-    <!-- 右侧卡片（对应雷达图右半轴维度） -->
+    <!-- 右侧卡片（对应雷达图右半轴维度，由生成脚本注入） -->
     <div class="radar-right">
-      <div class="dim-card">
-        <h4>④ {维度名}</h4>
-        <p>...</p>
-      </div>
-      <div class="dim-card">
-        <h4>⑤ {维度名}</h4>
-        <p>...</p>
-      </div>
-      <div class="dim-card">
-        <h4>⑥ {维度名}</h4>
-        <p>...</p>
-      </div>
+      {维度对比区-右}
     </div>
   </div>
 </div>
@@ -493,11 +454,11 @@
   new Chart(ctx, {
     type: 'radar',
     data: {
-      labels: ['{维度1}', '{维度2}', '{维度3}', '{维度4}', '{维度5}', '{维度6}'],
+      labels: {雷达标签},
       datasets: [
         {
           label: '蔡氏福宁',
-          data: [3, 3, 3.5, 3, 3, 3.5],
+          data: {雷达数据-品牌},
           borderColor: '#E85A24',
           backgroundColor: 'rgba(232,90,36,0.13)',
           borderWidth: 2.2,
@@ -507,8 +468,8 @@
           pointRadius: 4.5,
         },
         {
-          label: '{竞品1}',
-          data: [3.5, 3, 2, 3.5, 3.5, 1.5],
+          label: '{竞品1名称}',
+          data: {雷达数据-竞品1},
           borderColor: '#4a6b7a',
           backgroundColor: 'rgba(74,107,122,0.05)',
           borderWidth: 2,
@@ -518,8 +479,8 @@
           pointRadius: 3.5,
         },
         {
-          label: '{竞品2}',
-          data: [3, 3, 2.5, 3.5, 3.5, 2],
+          label: '{竞品2名称}',
+          data: {雷达数据-竞品2},
           borderColor: '#5a8a5a',
           backgroundColor: 'rgba(90,138,90,0.05)',
           borderWidth: 2,
@@ -529,8 +490,8 @@
           pointRadius: 3.5,
         },
         {
-          label: '{竞品3}',
-          data: [1.5, 1.5, 2, 2, 2, 2.5],
+          label: '{竞品3名称}',
+          data: {雷达数据-竞品3},
           borderColor: '#a07030',
           backgroundColor: 'rgba(160,112,48,0.05)',
           borderWidth: 2,
