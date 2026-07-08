@@ -178,6 +178,15 @@
     color: var(--ink);
     font-weight: 500;
   }
+  .benefit-tag {
+    background: var(--warm-green);
+    color: #fff;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
   
   .pod-vs {
     background: var(--brand-pale);
@@ -284,20 +293,18 @@
     margin-right: 8px;
   }
   
+  /* 产品系列（通用化：支持香型/功效/联名款/规格/温度等任意区分维度） */
   .sku-section {
     padding: 40px 60px;
     background: white;
   }
-
+  
   .sku-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
   }
-
-  /* ⚠️ 如果SKU只有2个，改为 repeat(2, 1fr) 并删除第3个sku-card */
-  /* ⚠️ 如果SKU有4-5个，改为 repeat(auto-fit, minmax(220px, 1fr)) */
-
+  
   .sku-card {
     border-radius: 8px;
     padding: 24px;
@@ -305,7 +312,7 @@
     position: relative;
     overflow: hidden;
   }
-
+  
   .sku-card::before {
     content: '';
     position: absolute;
@@ -316,21 +323,21 @@
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
   }
-
-  /* ⚠️ 5种通用渐变 —— 根据SKU数量选用前N个 */
+  
+  /* 5套渐变，按brief实际SKU数量取用（0~5张动态） */
   .sku-card.g1 { background: linear-gradient(135deg, #5c8a42 0%, #7ab65a 100%); }
   .sku-card.g2 { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%); }
   .sku-card.g3 { background: linear-gradient(135deg, #b8860b 0%, #d4a843 100%); }
-  .sku-card.g4 { background: linear-gradient(135deg, #4a6b7a 0%, #6b8e6b 100%); }
-  .sku-card.g5 { background: linear-gradient(135deg, #8b6f47 0%, #a07030 100%); }
-
+  .sku-card.g4 { background: linear-gradient(135deg, #c24518 0%, #e07a5f 100%); }
+  .sku-card.g5 { background: linear-gradient(135deg, #3a7a6a 0%, #5a9a8a 100%); }
+  
   .sku-name {
     font-family: 'Noto Serif SC', serif;
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 8px;
   }
-
+  
   .sku-desc {
     font-size: 13px;
     line-height: 1.6;
@@ -504,6 +511,14 @@
   </div>
 </div>
 
+<!-- 产品口播 -->
+<div class="copy-section">
+  <div class="copy-title">📢 产品口播</div>
+  <div class="copy-content">
+    {口播文案}
+  </div>
+</div>
+
 <!-- 核心卖点 -->
 <div class="pod-section">
   <div class="section-title">核心卖点 POD</div>
@@ -513,56 +528,98 @@
       <div class="pod-number">01</div>
       <div class="pod-title">{POD1标题}</div>
       <div class="pod-fab">
-        <strong>特征：</strong>{POD1特征}<br>
-        <strong>优势：</strong>{POD1优势}<br>
-        <strong>利益：</strong>{POD1利益}
+        <strong>特性：</strong>{特性}<br>
+        <strong>优势：</strong>{优势}<br>
+        <strong>利益：</strong><span class="benefit-tag">{利益}</span>
       </div>
       <div class="pod-vs">
-        <strong>vs 竞品：</strong>{POD1vs竞品}
+        <strong>vs 竞品：</strong>{vs竞品}
       </div>
     </div>
-
+    
     <!-- POD2 -->
     <div class="pod-card">
       <div class="pod-number">02</div>
       <div class="pod-title">{POD2标题}</div>
       <div class="pod-fab">
-        <strong>特征：</strong>{POD2特征}<br>
-        <strong>优势：</strong>{POD2优势}<br>
-        <strong>利益：</strong>{POD2利益}
+        <strong>特性：</strong>{特性}<br>
+        <strong>优势：</strong>{优势}<br>
+        <strong>利益：</strong><span class="benefit-tag">{利益}</span>
       </div>
       <div class="pod-vs">
-        <strong>vs 竞品：</strong>{POD2vs竞品}
+        <strong>vs 竞品：</strong>{vs竞品}
       </div>
     </div>
-
+    
     <!-- POD3 -->
     <div class="pod-card">
       <div class="pod-number">03</div>
       <div class="pod-title">{POD3标题}</div>
       <div class="pod-fab">
-        <strong>特征：</strong>{POD3特征}<br>
-        <strong>优势：</strong>{POD3优势}<br>
-        <strong>利益：</strong>{POD3利益}
+        <strong>特性：</strong>{特性}<br>
+        <strong>优势：</strong>{优势}<br>
+        <strong>利益：</strong><span class="benefit-tag">{利益}</span>
       </div>
       <div class="pod-vs">
-        <strong>vs 竞品：</strong>{POD3vs竞品}
+        <strong>vs 竞品：</strong>{vs竞品}
       </div>
     </div>
-
+    
     <!-- POD4 -->
     <div class="pod-card">
       <div class="pod-number">04</div>
       <div class="pod-title">{POD4标题}</div>
       <div class="pod-fab">
-        <strong>特征：</strong>{POD4特征}<br>
-        <strong>优势：</strong>{POD4优势}<br>
-        <strong>利益：</strong>{POD4利益}
+        <strong>特性：</strong>{特性}<br>
+        <strong>优势：</strong>{优势}<br>
+        <strong>利益：</strong><span class="benefit-tag">{利益}</span>
       </div>
       <div class="pod-vs">
-        <strong>vs 竞品：</strong>{POD4vs竞品}
+        <strong>vs 竞品：</strong>{vs竞品}
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 使用场景 -->
+<div class="scene-section">
+  <div class="section-title">使用场景</div>
+  <div class="scene-grid">
+    <div class="scene-card">
+      <div class="scene-icon">{场景1图标}</div>
+      <div class="scene-title">{场景1标题}</div>
+      <div class="scene-desc">{场景1描述}</div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-icon">{场景2图标}</div>
+      <div class="scene-title">{场景2标题}</div>
+      <div class="scene-desc">{场景2描述}</div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-icon">{场景3图标}</div>
+      <div class="scene-title">{场景3标题}</div>
+      <div class="scene-desc">{场景3描述}</div>
+    </div>
+  </div>
+</div>
+
+<!-- 产品系列（如有，区分维度见brief：香型/功效/联名款/规格/温度等；0~5张动态） -->
+<div class="sku-section">
+  <div class="section-title">产品系列</div>
+  <div class="sku-grid">
+    <div class="sku-card g1">
+      <div class="sku-name">{系列1名称}</div>
+      <div class="sku-desc">{系列1描述}</div>
+    </div>
+    <div class="sku-card g2">
+      <div class="sku-name">{系列2名称}</div>
+      <div class="sku-desc">{系列2描述}</div>
+    </div>
+    <div class="sku-card g3">
+      <div class="sku-name">{系列3名称}</div>
+      <div class="sku-desc">{系列3描述}</div>
+    </div>
+    <!-- 如brief有更多系列，按g4/g5继续添加；无系列则删除整个sku-section -->
   </div>
 </div>
 
@@ -627,69 +684,7 @@
   </div>
 </div>
 
-<!-- 产品系列（如有 —— 动态板块）
-     ⚠️ 用途：展示多SKU产品的区分维度（功效/规格/温度/香型等）
-     ⚠️ 判断标准：brief中是否有多SKU且需要可视化区分
-     ⚠️ 无多SKU的产品（如休足贴只有1种规格）：删除整个sku-section
-     ⚠️ SKU数量=2：grid改repeat(2,1fr)，删第3个sku-card，用.g1+.g2
-     ⚠️ SKU数量=3：默认，用.g1+.g2+.g3
-     ⚠️ SKU数量=4~5：grid改repeat(auto-fit,minmax(220px,1fr))，追加sku-card，用.g1~.g5
-     ⚠️ 板块标题动态替换：{SKU区分维度} → 如"产品系列"/"两款功效"/"三种规格"
--->
-<div class="sku-section">
-  <div class="section-title">{SKU区分维度}</div>
-  <div class="sku-grid">
-    <div class="sku-card g1">
-      <div class="sku-name">{SKU1名称}</div>
-      <div class="sku-desc">{SKU1描述}</div>
-    </div>
-    <div class="sku-card g2">
-      <div class="sku-name">{SKU2名称}</div>
-      <div class="sku-desc">{SKU2描述}</div>
-    </div>
-    <div class="sku-card g3">
-      <div class="sku-name">{SKU3名称}</div>
-      <div class="sku-desc">{SKU3描述}</div>
-    </div>
-  </div>
-</div>
-
-<!-- 使用场景 —— 动态板块
-     ⚠️ 场景数量必须与markdown一致（可能是3/4/5个）
-     ⚠️ 如果场景数≠3，修改grid-template-columns和增删scene-card
-     ⚠️ CSS .scene-grid 的 grid-template-columns 需同步调整 -->
-<div class="scene-section">
-  <div class="section-title">使用场景</div>
-  <div class="scene-grid">
-    <div class="scene-card">
-      <div class="scene-icon">{场景1图标}</div>
-      <div class="scene-title">{场景1标题}</div>
-      <div class="scene-desc">{场景1描述}</div>
-    </div>
-    <div class="scene-card">
-      <div class="scene-icon">{场景2图标}</div>
-      <div class="scene-title">{场景2标题}</div>
-      <div class="scene-desc">{场景2描述}</div>
-    </div>
-    <div class="scene-card">
-      <div class="scene-icon">{场景3图标}</div>
-      <div class="scene-title">{场景3标题}</div>
-      <div class="scene-desc">{场景3描述}</div>
-    </div>
-  </div>
-</div>
-
-<!-- 产品口播 -->
-<div class="copy-section">
-  <div class="copy-title">📢 产品口播（30秒版）</div>
-  <div class="copy-content">
-    {口播文案}
-  </div>
-</div>
-
-<!-- FAQ —— 动态板块
-     ⚠️ FAQ数量必须与markdown一致（可能是4/5/6/7个）
-     ⚠️ 如果FAQ数≠6，增删faq-item -->
+<!-- FAQ -->
 <div class="faq-section">
   <div class="section-title">常见问题 FAQ</div>
   <div class="faq-list">
@@ -725,7 +720,7 @@
   <div class="footer-logo-wrap">
     <img src="logo.png" alt="蔡氏福宁" class="footer-logo" />
   </div>
-  <div class="footer-warning">⚠️ 内部绝密资料仅供参考 不可直接作为广告用语</div>
+  <div class="footer-warning">⚠️ 内部资料仅供参考，不可直接作为广告用语</div>
   <div style="margin-top: 8px;">蔡氏福宁 · 新中式养生个护品牌 · Since 1828</div>
 </div>
 

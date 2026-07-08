@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{产品名称} - 竞品对比</title>
+<title>{产品名} - 竞品对比</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -257,33 +257,52 @@
     border-radius: 50%;
   }
 
-  /* ===== 维度说明卡片（左右两侧）===== */
-  .dim-card {
+  /* ===== 洞察卡片（雷达图左右两侧，定性结论，匹配雷达维度）===== */
+  .insight-card {
     background: white;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 20px 22px;
     border-left: 3px solid var(--brand);
   }
-  .dim-card h4 {
+  .insight-card.ic-neutral {
+    border-left-color: var(--text-light);
+  }
+  .insight-tag {
+    display: inline-block;
     font-family: 'Noto Serif SC', serif;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--brand);
+    color: #fff;
+    background: var(--brand);
+    padding: 2px 10px;
+    border-radius: 10px;
     margin-bottom: 10px;
   }
-  .dim-card p {
+  .insight-card.ic-neutral .insight-tag {
+    background: var(--text-light);
+  }
+  .insight-card p {
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.85;
   }
+  .insight-card p strong { color: var(--brand-dark); }
+  /* 已废弃：v2.5 起洞察卡不再显示依据来源行 */
+  .insight-src {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--divider);
+    font-size: 11px;
+    color: var(--text-light);
+  }
   /* 品牌名颜色 — 与雷达图/参数卡配色一致 */
-  .dim-card .b-brand { color: var(--brand); font-weight: 600; }
-  .dim-card .b-c1 { color: var(--c1); font-weight: 600; }
-  .dim-card .b-c2 { color: var(--c2); font-weight: 600; }
-  .dim-card .b-c3 { color: var(--c3); font-weight: 600; }
+  .insight-card .b-brand { color: var(--brand); font-weight: 600; }
+  .insight-card .b-c1 { color: var(--c1); font-weight: 600; }
+  .insight-card .b-c2 { color: var(--c2); font-weight: 600; }
+  .insight-card .b-c3 { color: var(--c3); font-weight: 600; }
 
-  /* ===== 核心结论 ===== */
+  /* ===== 购买建议 ===== */
   .conclusion-card {
     background: var(--brand-pale);
     border-top: 4px solid var(--brand);
@@ -320,12 +339,6 @@
     text-align: center;
   }
   .footer-logo-wrap { margin-bottom: 12px; }
-  .footer-warning {
-    color: #ffcc00;
-    font-size: 13px;
-    margin-top: 8px;
-    letter-spacing: 1px;
-  }
   .footer-logo {
     height: 36px;
     width: auto;
@@ -337,7 +350,7 @@
     .positioning-grid, .param-grid { grid-template-columns: repeat(2, 1fr); }
     .radar-layout { grid-template-columns: 1fr; }
     .radar-left, .radar-right { flex-direction: row; flex-wrap: wrap; }
-    .radar-left .dim-card, .radar-right .dim-card { flex: 1; min-width: 220px; }
+    .radar-left .insight-card, .radar-right .insight-card { flex: 1; min-width: 220px; }
   }
   @media (max-width: 768px) {
     .header, .section { padding: 30px 24px; }
@@ -364,7 +377,7 @@
   </div>
 </div>
 
-<!-- 竞品定位（4卡片，品牌色区分） -->
+<!-- 竞品定位（N卡片=N个品牌；每卡=品牌心智+产品特点+可选价格差异；禁内部定位词/竞品销量数据；1句约20-35字） -->
 <div class="section" style="background: var(--paper);">
   <div class="section-title">竞品定位</div>
   <div class="positioning-grid">
@@ -387,12 +400,29 @@
   </div>
 </div>
 
-<!-- 核心参数速查（卡片式，通用化，不叫"技术路径"） -->
+<!-- 核心参数速查（卡片式，按品牌独立呈现；每个品牌只写brief描述的该品牌方面，不与蔡氏福宁强行一一映射，无描述则不写该行，不写[待补充]） -->
 <div class="section" style="background: white;">
   <div class="section-title">核心参数速查</div>
   <div class="param-grid">
-    <!-- 参数卡片由生成脚本动态注入（4品牌 × N维度） -->
-    {参数卡片区}
+    <!-- 每个品牌一张卡片，独立列出 brief 描述该品牌的参数/方面；不与蔡氏福宁或其他竞品强行对齐同维度；某品牌未描述的方面整行不写（不写[待补充]、不砍蔡氏福宁独有项） -->
+    <div class="param-card brand">
+      <h4>● {品牌名}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c1">
+      <h4>○ {竞品1名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+      <div class="param-row"><span class="param-label">{参数2名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c2">
+      <h4>○ {竞品2名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+    </div>
+    <div class="param-card c3">
+      <h4>○ {竞品3名称}</h4>
+      <div class="param-row"><span class="param-label">{参数1名}</span><span class="param-val">{值}</span></div>
+    </div>
   </div>
 </div>
 
@@ -400,34 +430,50 @@
 <div class="section" style="background: var(--paper);">
   <div class="section-title">多维度综合对比</div>
   <div class="radar-layout">
-    <!-- 左侧卡片（对应雷达图左半轴维度，由生成脚本注入） -->
+    <!-- 左侧洞察卡片：按雷达维度顺序的前半维度放入（左右均分，保持平衡）；品牌色/中性边框仍按该维度谁领先上色；数量/标签须与雷达维度一一对应，含圈号①②③ -->
     <div class="radar-left">
-      {维度对比区-左}
+      <div class="insight-card ic-brand">
+        <div class="insight-tag">核心优势</div>
+        <p>{洞察结论句，定性表述，不出现数字}</p>      </div>
+      <div class="insight-card ic-brand">
+        <div class="insight-tag">安全性</div>
+        <p>{洞察结论句，定性表述}</p>      </div>
+      <div class="insight-card ic-brand">
+        <div class="insight-tag">香氛体验</div>
+        <p>{洞察结论句，定性表述}</p>      </div>
     </div>
     <!-- 中间雷达图 -->
     <div class="radar-center">
       <canvas id="radarChart" width="400" height="400"></canvas>
       <div class="radar-legend">
         <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--brand);"></span>蔡氏福宁</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c1);"></span>{竞品1名称}</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c2);"></span>{竞品2名称}</div>
-        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c3);"></span>{竞品3名称}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c1);"></span>{竞品1}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c2);"></span>{竞品2}</div>
+        <div class="radar-legend-item"><span class="radar-legend-dot" style="background:var(--c3);"></span>{竞品3}</div>
       </div>
     </div>
-    <!-- 右侧卡片（对应雷达图右半轴维度，由生成脚本注入） -->
+    <!-- 右侧洞察卡片：按雷达维度顺序的后半维度放入（左右均分，保持平衡）；品牌色/中性边框仍按该维度谁领先上色；数量/标签须与雷达维度一一对应，含圈号①②③ -->
     <div class="radar-right">
-      {维度对比区-右}
+      <div class="insight-card ic-neutral">
+        <div class="insight-tag">性价比定位</div>
+        <p>{洞察结论句，定性表述}</p>      </div>
+      <div class="insight-card ic-neutral">
+        <div class="insight-tag">目标客群</div>
+        <p>{洞察结论句，定性表述}</p>      </div>
+      <div class="insight-card ic-neutral">
+        <div class="insight-tag">购买决策</div>
+        <p>{洞察结论句，定性表述}</p>      </div>
     </div>
   </div>
 </div>
 
-<!-- 核心结论 -->
+<!-- 蔡氏福宁购买理由（引导选择蔡氏福宁的视角叙事） -->
 <div class="section" style="background: white;">
-  <div class="section-title">核心结论</div>
+  <div class="section-title">购买建议</div>
   <div class="conclusion-card">
     <div class="conclusion-title">📊 购买建议</div>
     <div class="conclusion-content">
-      {核心结论内容}
+      <p>{购买建议连贯段落：先总述蔡氏福宁 vs 主要竞品的差异化竞争格局 → 分述各家核心长处（竞品A长于'xx'，竞品B长于'yy'）→ 聚焦蔡氏福宁差异化壁垒 → 给出适用人群建议；关键词用单引号'xxx'标注，禁止数字/星级/百分比}</p>
     </div>
   </div>
 </div>
@@ -437,28 +483,31 @@
   <div class="footer-logo-wrap">
     <img src="logo.png" alt="蔡氏福宁" class="footer-logo" />
   </div>
-  <div class="footer-warning">⚠️ 内部绝密资料仅供参考 不可直接作为广告用语</div>
+  <div class="footer-warning">⚠️ 内部资料仅供参考，不可直接作为广告用语</div>
   <div style="margin-top: 8px;">蔡氏福宁 · 新中式养生个护品牌 · Since 1828</div>
 </div>
 
 <script>
   /*
-   * 雷达图规范：
+   * 雷达图规范（⚠️ 分数为后台数据，前端零数字呈现）：
    * 1. 维度数量不固定，按产品brief中实际定义的维度动态生成
-   * 2. 打分用示意值（1-4），不要太满，最高不超过3.5
+   * 2. 分数仅作绘制形状的后台数据，来自markdown「雷达图后台数据」区，经用户确认
    * 3. 蔡氏福宁用填充色突出（fill opacity 0.13，竞品0.05）
-   * 4. 不显示刻度数字（ticks.display: false）
-   * 5. 生成前必须与用户确认维度和各品牌打分排名
+   * 4. 零数字呈现三处必须同时满足：
+   *    - scales.r.ticks.display = false  （不显示刻度数字）
+   *    - plugins.tooltip.enabled = false （关闭悬停数值）
+   *    - 左右洞察卡片文字禁止出现任何分数/星级/百分比数字
+   * 5. 生成前必须与用户确认维度和各品牌打分排名（分数不进入HTML）
    */
   const ctx = document.getElementById('radarChart').getContext('2d');
   new Chart(ctx, {
     type: 'radar',
     data: {
-      labels: {雷达标签},
+      labels: ['{维度1}', '{维度2}', '{维度3}', '{维度4}', '{维度5}', '{维度6}'],
       datasets: [
         {
           label: '蔡氏福宁',
-          data: {雷达数据-品牌},
+          data: [3, 3, 3.5, 3, 3, 3.5],
           borderColor: '#E85A24',
           backgroundColor: 'rgba(232,90,36,0.13)',
           borderWidth: 2.2,
@@ -468,8 +517,8 @@
           pointRadius: 4.5,
         },
         {
-          label: '{竞品1名称}',
-          data: {雷达数据-竞品1},
+          label: '{竞品1}',
+          data: [3.5, 3, 2, 3.5, 3.5, 1.5],
           borderColor: '#4a6b7a',
           backgroundColor: 'rgba(74,107,122,0.05)',
           borderWidth: 2,
@@ -479,8 +528,8 @@
           pointRadius: 3.5,
         },
         {
-          label: '{竞品2名称}',
-          data: {雷达数据-竞品2},
+          label: '{竞品2}',
+          data: [3, 3, 2.5, 3.5, 3.5, 2],
           borderColor: '#5a8a5a',
           backgroundColor: 'rgba(90,138,90,0.05)',
           borderWidth: 2,
@@ -490,8 +539,8 @@
           pointRadius: 3.5,
         },
         {
-          label: '{竞品3名称}',
-          data: {雷达数据-竞品3},
+          label: '{竞品3}',
+          data: [1.5, 1.5, 2, 2, 2, 2.5],
           borderColor: '#a07030',
           backgroundColor: 'rgba(160,112,48,0.05)',
           borderWidth: 2,
@@ -520,10 +569,7 @@
       },
       plugins: {
         legend: { display: false },
-        tooltip: {
-          titleFont: { family: "'Noto Sans SC', sans-serif" },
-          bodyFont: { family: "'Noto Sans SC', sans-serif" },
-        }
+        tooltip: { enabled: false },
       }
     }
   });
